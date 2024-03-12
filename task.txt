@@ -1,0 +1,86 @@
+```
+# E Commerce
+
+The project is a comprehensive e-commerce platform with various features like user authentication, product management, order processing, payment handling, and more.
+
+**Create ERD:**
+
+**Models**
+
+1. **Profile Model:** Fields for user authentication, profile management and role.
+    1. profile picture
+    2. role
+    3. phone-number
+    4. user 1-1
+2. **Product Model:** Fields for product details, such as name, description, price, category, etc.
+    1. name, 
+    2. description, 
+    3. price, 
+    4. category FK
+    5. seller FK
+    6. shop fk
+    7. rating
+3. **Category Model:** 
+    1. name
+4. **Order Model:** Fields for order details, including products, quantities, total amount, shipping address, etc.
+    1. buyer
+    2. seller
+    3. shop owner
+    4. quantities
+    5. total amount
+    6. shipping address.
+    7. status
+5. Shop
+    1. Owner
+    2. Name
+    3. rating
+6. **Review & Rating Model:** Fields for user reviews and ratings associated with products.
+7. **Inventory Model:** Product, Seller, total price etc
+    1. Shop fk
+    2. Product, fk
+    3. Seller, fk
+    4. total quantity etc
+
+**Celery Task**
+
+- **Email Sending Task:** Asynchronous task for sending emails for order confirmations, password reset links, password Update etc. (Use sesame for password reset and invite link)
+- **Scheduled Tasks:** Tasks for scheduled activities like generating sales reports, generate sales etc.
+    - Each shop Sale report for a week (reportlab)
+    - Seller Weekly sale report. (reportlab)
+    - Task to do shopping (daily)
+    - Inventory add task (after above task ran)
+
+**APIs**
+
+**User Authentication:**
+
+- User registration
+- User login
+- User logout
+- Password reset
+- Password Change
+- User profile Update
+- Invite User to system
+
+**Generic APIs**
+
+**For Buyer**
+
+- Get all shops
+- Get items in a shop
+- Buy something from shop
+- Get my orders
+- delete order if not confirmed.
+
+**For seller**
+
+- Update Inventory of a product
+- Process order for a customer
+- request owner to add self into the shop (send mail)
+- check sales status for a product
+
+**For Owner**
+
+- Add seller to the shop
+- Check sales status for all sellers
+```
