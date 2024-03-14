@@ -56,7 +56,12 @@ class Order(models.Model):
     seller = models.ForeignKey(
         "Profile", on_delete=models.CASCADE, related_name="seller"
     )
-    shop = models.ForeignKey("Shop", on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        "Product", on_delete=models.CASCADE, related_name="order"
+    )
+    shop = models.ForeignKey(
+        "Shop", on_delete=models.CASCADE, related_name="order"
+    )
     quantity = models.IntegerField(_("quantity"))
     total_amount = models.IntegerField(_("total amount"))
     shipping_address = models.TextField(_("shipping address"))
@@ -66,7 +71,9 @@ class Order(models.Model):
 
 
 class Shop(models.Model):
-    owner = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        "Profile", on_delete=models.CASCADE, related_name="shop"
+    )
     name = models.CharField(_("name"), max_length=50)
     rating = models.IntegerField(_("rating"), default=0)
 
@@ -75,9 +82,15 @@ class Shop(models.Model):
 
 
 class Inventory(models.Model):
-    shop = models.ForeignKey("Shop", on_delete=models.CASCADE)
-    product = models.ForeignKey("Product", on_delete=models.CASCADE)
-    seller = models.ForeignKey("Profile", on_delete=models.CASCADE)
+    shop = models.ForeignKey(
+        "Shop", on_delete=models.CASCADE, related_name="inventory"
+    )
+    product = models.ForeignKey(
+        "Product", on_delete=models.CASCADE, related_name="inventory"
+    )
+    seller = models.ForeignKey(
+        "Profile", on_delete=models.CASCADE, related_name="inventory"
+    )
     total_quantity = models.IntegerField(_("total quantity"))
 
     def __str__(self):
@@ -85,22 +98,33 @@ class Inventory(models.Model):
 
 
 class Review(models.Model):
-    user = models.ForeignKey("Profile", on_delete=models.CASCADE)
-    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    reviewer = models.ForeignKey(
+        "Profile", on_delete=models.CASCADE, related_name="review"
+    )
+    product = models.ForeignKey(
+        "Product", on_delete=models.CASCADE, related_name="review"
+    )
+
     rating = models.IntegerField(_("rating"))
     comment = models.TextField(_("comment"))
 
     def __str__(self):
-        return self.user.user.email
+        return self.reviewer.user.email
 
 
 class Product(models.Model):
     name = models.CharField(_("name"), max_length=50)
     description = models.TextField(_("description"))
     price = models.IntegerField(_("price"))
-    category = models.ForeignKey("Category", on_delete=models.CASCADE)
-    seller = models.ForeignKey("Profile", on_delete=models.CASCADE)
-    shop = models.ForeignKey("Shop", on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "Category", on_delete=models.CASCADE, related_name="product"
+    )
+    seller = models.ForeignKey(
+        "Profile", on_delete=models.CASCADE, related_name="product"
+    )
+    shop = models.ForeignKey(
+        "Shop", on_delete=models.CASCADE, related_name="product"
+    )
     rating = models.IntegerField(_("rating"), default=0)
 
     def __str__(self):

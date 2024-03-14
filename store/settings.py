@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -37,7 +39,7 @@ INSTALLED_APPS = [
     "drf_registration",
     "django_celery_beat",
     "django_celery_results",
-    'store_app',
+    'store_app.apps.StoreAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -61,7 +63,7 @@ ROOT_URLCONF = 'store.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS':  [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -129,4 +131,37 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# User model
 AUTH_USER_MODEL = "store_app.User"
+
+# JWT settings
+REST_FRAMEWORK = {
+   'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
+
+ACCESS_TOKEN_LIFETIME = timedelta(days=1)
+
+#sesame settings
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "sesame.backends.ModelBackend",
+]
+
+#Celer
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'
+
+
+
+# CELERY_BEAT_SCHEDULE = {
+#    'buy' : {
+#        'task': 'store_app.tasks.buy_items_from_shop',
+#        'schedule': 60
+#    }
+# }

@@ -28,6 +28,8 @@ from .serializers import (
     UserSerializer,
 )
 
+# from .tasks import create_prod_inventory
+
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
@@ -84,6 +86,8 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         refresh = request.data.get("refresh")
 
@@ -101,8 +105,10 @@ class LogoutView(APIView):
             )
         except Exception as e:
             return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 def index(request):
+    # create_prod_inventory.delay()
     return render(request, "index.html")

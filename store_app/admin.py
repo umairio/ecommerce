@@ -21,7 +21,7 @@ class UserAdmin(admin.ModelAdmin):
 
 
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ("user", "product", "rating", "comment")
+    list_display = ("__str__", "product", "rating", "comment")
 
 
 class ProductAdmin(admin.ModelAdmin):
@@ -33,6 +33,7 @@ class ProductAdmin(admin.ModelAdmin):
         "seller",
         "shop",
     )
+    list_filter = ("category", "seller", "shop")
 
 
 class CategoryAdmin(admin.ModelAdmin):
@@ -43,10 +44,10 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = (
         "buyer",
         "seller",
+        "product",
         "shop",
         "quantity",
         "total_amount",
-        "shipping_address",
     )
 
 
@@ -55,7 +56,8 @@ class ShopAdmin(admin.ModelAdmin):
 
 
 class InventoryAdmin(admin.ModelAdmin):
-    list_display = ("shop", "product", "seller", "total_quantity")
+    list_display = ("product", "shop", "seller", "total_quantity")
+    list_filter = ("shop", "seller", "product__category")
 
 
 admin.site.register(Profile, ProfileAdmin)
