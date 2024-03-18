@@ -32,6 +32,7 @@ class ProductAdmin(admin.ModelAdmin):
         "category",
         "seller",
         "shop",
+        "rating",
     )
     list_filter = ("category", "seller", "shop")
 
@@ -48,7 +49,12 @@ class OrderAdmin(admin.ModelAdmin):
         "shop",
         "quantity",
         "total_amount",
+        "status",
+        "review_rating",
     )
+
+    def review_rating(self, obj):
+        return obj.review.rating
 
 
 class ShopAdmin(admin.ModelAdmin):

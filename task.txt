@@ -1,10 +1,9 @@
 **Create ERD:**
-**Celery Task**
 
 - **Email Sending Task:** Asynchronous task for sending emails for order confirmations, password reset links, password Update etc.
-- **Scheduled Tasks:** Tasks for scheduled activities like generating sales reports, generate sales etc.
+- **Scheduled Tasks:** Tasks for scheduled activities like generating sales reports, generate sales etc.✅
     - Each shop Sale report for a week (reportlab)✅
-    - Seller Weekly sale report. (reportlab)
+    - Seller Weekly sale report. (reportlab)✅
     - Task to do shopping (daily)✅
     - Inventory add task (after above task ran)✅
 

@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
 
 from .managers import UserManager
@@ -50,6 +51,13 @@ class Category(models.Model):
 
 
 class Order(models.Model):
+    class Status(models.TextChoices):
+        Null = "null"
+        Cart = "cart"
+        Confirmed = "confirmed"
+        Shipped = "shipped"
+        Delivered = "delivered"
+
     buyer = models.ForeignKey(
         "Profile", on_delete=models.CASCADE, related_name="buyer"
     )
@@ -65,20 +73,12 @@ class Order(models.Model):
     quantity = models.IntegerField(_("quantity"))
     total_amount = models.IntegerField(_("total amount"))
     shipping_address = models.TextField(_("shipping address"))
+    status = models.CharField(
+        _("status"), max_length=10, choices=Status.choices, default=Status.Null
+    )
 
     def __str__(self):
         return self.buyer.user.email
-
-
-class Shop(models.Model):
-    owner = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="shop"
-    )
-    name = models.CharField(_("name"), max_length=50)
-    rating = models.IntegerField(_("rating"), default=0)
-
-    def __str__(self):
-        return self.name
 
 
 class Inventory(models.Model):
@@ -104,7 +104,9 @@ class Review(models.Model):
     product = models.ForeignKey(
         "Product", on_delete=models.CASCADE, related_name="review"
     )
-
+    order = models.OneToOneField(
+        "Order", on_delete=models.CASCADE, related_name="review", null=True
+    )
     rating = models.IntegerField(_("rating"))
     comment = models.TextField(_("comment"))
 
@@ -125,7 +127,28 @@ class Product(models.Model):
     shop = models.ForeignKey(
         "Shop", on_delete=models.CASCADE, related_name="product"
     )
-    rating = models.IntegerField(_("rating"), default=0)
+
+    @property
+    def rating(self):
+        average_rating = self.review.aggregate(Avg("rating"))["rating__avg"]
+        return round(average_rating, 2) if average_rating is not None else None
+
+    def __str__(self):
+        return self.name
+
+
+class Shop(models.Model):
+    owner = models.ForeignKey(
+        "Profile", on_delete=models.CASCADE, related_name="shop"
+    )
+    name = models.CharField(_("name"), max_length=50)
+
+    @property
+    def rating(self):
+        average_rating = self.product.aggregate(Avg("review__rating"))[
+            "review__rating__avg"
+        ]
+        return round(average_rating, 2) if average_rating is not None else None
 
     def __str__(self):
         return self.name

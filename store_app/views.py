@@ -29,8 +29,10 @@ from .serializers import (
     UserSerializer,
 )
 
+
 def index(request):
     return render(request, "index.html")
+
 
 class ChangePasswordView(generics.UpdateAPIView):
     serializer_class = ChangePasswordSerializer
