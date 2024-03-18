@@ -13,3 +13,4 @@ drf-registration
 flake8
 isort
 pre-commit
+reportlab

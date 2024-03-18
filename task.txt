@@ -1,9 +1,9 @@
 **Create ERD:**
 **Celery Task**
 
-- **Email Sending Task:** Asynchronous task for sending emails for order confirmations, password reset links, password Update etc. (Use sesame for password reset and invite link)
+- **Email Sending Task:** Asynchronous task for sending emails for order confirmations, password reset links, password Update etc.
 - **Scheduled Tasks:** Tasks for scheduled activities like generating sales reports, generate sales etc.
-    - Each shop Sale report for a week (reportlab)
+    - Each shop Sale report for a week (reportlab)✅
     - Seller Weekly sale report. (reportlab)
     - Task to do shopping (daily)✅
     - Inventory add task (after above task ran)✅
@@ -15,17 +15,16 @@
 - User registration✅
 - User login✅
 - User logout✅
-- Password reset
-- Password Change✅
 - User profile Update✅
-- Invite User to system
+- Password Change✅
+- Password reset / Invite User to system
 
 **Generic APIs**
 
 **For Buyer**
 
 - Get all shops✅
-- Get items in a shop
+- Get items in a shop✅
 - Buy something from shop✅
 - Get my orders✅
 - delete order if not confirmed.

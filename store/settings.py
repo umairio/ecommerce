@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
-    'django_rest_passwordreset',
     "rest_framework_simplejwt",
     "rest_framework",
     "drf_registration",
