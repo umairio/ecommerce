@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        exclude: |
+          (?x)^(.*/settings\.py|.*migrations.*)$
+        args: [--max-line-length=120]
+         
+
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        exclude: |
+          (?x)^(.*/settings\.py|.*migrations.*)$

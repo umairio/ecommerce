@@ -15,7 +15,7 @@ fake = Faker()
 @shared_task(bind=True)
 def buy_items_from_shop(self):
     product = (
-        Product.objects.filter(inventory__total_quantity__gt=3)
+        Product.objects.filter(inventory__total_quantity__gte=3)
         .order_by("?")
         .first()
     )
@@ -41,7 +41,7 @@ def buy_items_from_shop(self):
 
 @shared_task(bind=True)
 def add_stock(self):
-    Inventory.objects.filter(total_quantity__lt=3).update(
+    Inventory.objects.filter(total_quantity__lte=3).update(
         total_quantity=F("total_quantity") + 10
     )
 

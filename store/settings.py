@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
+    'django_rest_passwordreset',
     "rest_framework_simplejwt",
     "rest_framework",
     "drf_registration",
@@ -157,11 +158,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'default'
 
+#email
 
-
-# CELERY_BEAT_SCHEDULE = {
-#    'buy' : {
-#        'task': 'store_app.tasks.buy_items_from_shop',
-#        'schedule': 60
-#    }
-# }
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_PORT = 587  
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'hyby2cupchai@gmail.com'
+EMAIL_HOST_PASSWORD = ' @'

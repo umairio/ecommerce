@@ -3,38 +3,27 @@ from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from sesame.views import LoginView
 
-from .views import (
-    CategoryViewSet,
-    InventoryViewSet,
-    LogoutView,
-    OrderViewSet,
-    ProductViewSet,
-    ProfileViewSet,
-    RegisterView,
-    ReviewViewSet,
-    ShopViewSet,
-    UserViewSet,
-    index,
-)
+from . import views
 
 router = routers.DefaultRouter()
-router.register("user", UserViewSet),
-router.register("profile", ProfileViewSet)
-router.register("shop", ShopViewSet)
-router.register("order", OrderViewSet)
-router.register("review", ReviewViewSet)
-router.register("product", ProductViewSet)
-router.register("category", CategoryViewSet)
-router.register("inventory", InventoryViewSet)
+router.register("user", views.UserViewSet),
+router.register("profile", views.ProfileViewSet)
+router.register("shop", views.ShopViewSet)
+router.register("order", views.OrderViewSet)
+router.register("review", views.ReviewViewSet)
+router.register("product", views.ProductViewSet)
+router.register("category", views.CategoryViewSet)
+router.register("inventory", views.InventoryViewSet)
 
 urlpatterns = router.urls
 
 urlpatterns = [
-    path("", index),
+    path("", views.index),
     path("api/", include(router.urls)),
-    path("api/register/", RegisterView.as_view(), name="register"),
+    path("api/register/", views.RegisterView.as_view(), name="register"),
     path("api/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("login/auth/", LoginView.as_view(), name="login"),
     path("api/login/refresh/", TokenRefreshView.as_view()),
-    path("api/logout/", LogoutView.as_view(), name="logout"),
+    path("api/logout/", views.LogoutView.as_view(), name="logout"),
+    path("api/change-password/", views.ChangePasswordView.as_view()),
 ]

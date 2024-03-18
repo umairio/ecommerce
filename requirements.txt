@@ -7,7 +7,6 @@ djangorestframework-simplejwt
 Faker
 redis
 django_celery_results
-django-celery-beat
 djangorestframework-jwt-refresh-token
 rest-framework-simplejwt
 drf-registration

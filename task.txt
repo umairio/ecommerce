@@ -6,33 +6,33 @@
     - Each shop Sale report for a week (reportlab)
     - Seller Weekly sale report. (reportlab)
     - Task to do shopping (daily)✅
-    - Inventory add task (after above task ran)
+    - Inventory add task (after above task ran)✅
 
 **APIs**
 
 **User Authentication:**
 
-- User registration
-- User login
-- User logout
+- User registration✅
+- User login✅
+- User logout✅
 - Password reset
-- Password Change
-- User profile Update
+- Password Change✅
+- User profile Update✅
 - Invite User to system
 
 **Generic APIs**
 
 **For Buyer**
 
-- Get all shops
+- Get all shops✅
 - Get items in a shop
-- Buy something from shop
-- Get my orders
+- Buy something from shop✅
+- Get my orders✅
 - delete order if not confirmed.
 
 **For seller**
 
-- Update Inventory of a product
+- Update Inventory of a product✅
 - Process order for a customer
 - request owner to add self into the shop (send mail)
 - check sales status for a product
