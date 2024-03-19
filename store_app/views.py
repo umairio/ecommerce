@@ -20,7 +20,7 @@ from .models import (
     Shop,
     User,
 )
-from .permissions import ShopPermission
+from .permissions import OwnerPermission, SellerPermission
 from .serializers import (
     CategorySerializer,
     ChangePasswordSerializer,
@@ -115,14 +115,13 @@ class OrderViewSet(ModelViewSet):
 class ShopViewSet(ModelViewSet):
     serializer_class = ShopSerializer
     queryset = Shop.objects.all()
-    permission_classes = [IsAuthenticated, ShopPermission]
-
+    permission_classes = [IsAuthenticated, OwnerPermission]
 
 
 class InventoryViewSet(ModelViewSet):
     serializer_class = InventorySerializer
     queryset = Inventory.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, SellerPermission]
 
 
 class RegisterView(generics.CreateAPIView):
@@ -157,7 +156,6 @@ class LogoutView(APIView):
 
 class ShopProductView(generics.ListAPIView):
     serializer_class = ProductSerializer
-    queryset = Product.objects.all()
 
     def get_queryset(self):
 
@@ -166,8 +164,24 @@ class ShopProductView(generics.ListAPIView):
         if pk is True:
             pk = self.kwargs["pk"]
             return Product.objects.filter(shop=pk)
-        
+
         else:
             owner = self.request.user.profile.id
             shop = Shop.objects.get(owner=owner)
             return Product.objects.filter(shop=shop)
+
+
+class BuyerOrderView(generics.ListAPIView):
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+
+        pk = bool(self.kwargs)
+
+        if pk is True:
+            pk = self.kwargs["pk"]
+            return Order.objects.filter(buyer=pk)
+
+        else:
+            buyer = self.request.user.profile.id
+            return Order.objects.filter(buyer=buyer)

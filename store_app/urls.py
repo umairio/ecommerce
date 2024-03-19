@@ -28,4 +28,6 @@ urlpatterns = [
     path("api/change-password/", views.ChangePasswordView.as_view()),
     path("api/shop-product/<int:pk>/", views.ShopProductView.as_view()),
     path("api/shop-product/", views.ShopProductView.as_view()),
+    path("api/buyer-order/<int:pk>/", views.BuyerOrderView.as_view()),
+    path("api/buyer-order/", views.BuyerOrderView.as_view()),
 ]
