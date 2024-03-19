@@ -37,6 +37,6 @@
 
 **For Owner**
 
-- Add seller to the shop
+- Add seller to the shop✅
 - Check sales status for all sellers
 ```

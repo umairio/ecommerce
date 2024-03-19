@@ -1,6 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -16,6 +20,7 @@ from .models import (
     Shop,
     User,
 )
+from .permissions import ShopPermission
 from .serializers import (
     CategorySerializer,
     ChangePasswordSerializer,
@@ -110,7 +115,8 @@ class OrderViewSet(ModelViewSet):
 class ShopViewSet(ModelViewSet):
     serializer_class = ShopSerializer
     queryset = Shop.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ShopPermission]
+
 
 
 class InventoryViewSet(ModelViewSet):
@@ -154,4 +160,14 @@ class ShopProductView(generics.ListAPIView):
     queryset = Product.objects.all()
 
     def get_queryset(self):
-        return Product.objects.filter(shop=self.kwargs["pk"])
+
+        pk = bool(self.kwargs)
+
+        if pk is True:
+            pk = self.kwargs["pk"]
+            return Product.objects.filter(shop=pk)
+        
+        else:
+            owner = self.request.user.profile.id
+            shop = Shop.objects.get(owner=owner)
+            return Product.objects.filter(shop=shop)

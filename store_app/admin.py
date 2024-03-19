@@ -13,11 +13,11 @@ from .models import (
 
 
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "role", "phone_number")
+    list_display = ("id", "__str__", "role", "phone_number")
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ("email", "first_name", "last_name", "is_staff")
+    list_display = ("id", "email", "first_name", "last_name", "is_staff")
 
 
 class ReviewAdmin(admin.ModelAdmin):
@@ -58,7 +58,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class ShopAdmin(admin.ModelAdmin):
-    list_display = ("owner", "name", "rating")
+    list_display = ("name", "owner", "rating")
 
 
 class InventoryAdmin(admin.ModelAdmin):

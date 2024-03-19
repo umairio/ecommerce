@@ -141,7 +141,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-ACCESS_TOKEN_LIFETIME = timedelta(days=1)
+ACCESS_TOKEN_LIFETIME = timedelta(hours=5)
 
 #sesame settings
 AUTHENTICATION_BACKENDS = [

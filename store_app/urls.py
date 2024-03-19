@@ -8,7 +8,7 @@ from . import views
 router = routers.DefaultRouter()
 router.register("user", views.UserViewSet),
 router.register("profile", views.ProfileViewSet)
-router.register("shop", views.ShopViewSet)
+router.register("shop1", views.ShopViewSet)
 router.register("order", views.OrderViewSet)
 router.register("review", views.ReviewViewSet)
 router.register("product", views.ProductViewSet)
@@ -22,9 +22,10 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/register/", views.RegisterView.as_view(), name="register"),
     path("api/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("login/auth/", LoginView.as_view(), name="login"),
+    path("login/", LoginView.as_view(), name="login"),
     path("api/login/refresh/", TokenRefreshView.as_view()),
     path("api/logout/", views.LogoutView.as_view(), name="logout"),
     path("api/change-password/", views.ChangePasswordView.as_view()),
-    path("api/shop/<int:pk>/product/", views.ShopProductView.as_view()),
+    path("api/shop-product/<int:pk>/", views.ShopProductView.as_view()),
+    path("api/shop-product/", views.ShopProductView.as_view()),
 ]
