@@ -30,4 +30,5 @@ urlpatterns = [
     path("api/shop-product/", views.ShopProductView.as_view()),
     path("api/buyer-order/<int:pk>/", views.BuyerOrderView.as_view()),
     path("api/buyer-order/", views.BuyerOrderView.as_view()),
+    path("api/sales-status/<int:pk>/", views.SalesStatusView.as_view())
 ]

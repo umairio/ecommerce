@@ -52,7 +52,6 @@ class Category(models.Model):
 
 class Order(models.Model):
     class Status(models.TextChoices):
-        Null = "null"
         Cart = "cart"
         Confirmed = "confirmed"
         Shipped = "shipped"
@@ -74,7 +73,7 @@ class Order(models.Model):
     total_amount = models.IntegerField(_("total amount"))
     shipping_address = models.TextField(_("shipping address"))
     status = models.CharField(
-        _("status"), max_length=10, choices=Status.choices, default=Status.Null
+        _("status"), max_length=10, choices=Status.choices, default=Status.Cart
     )
 
     def __str__(self):

@@ -134,14 +134,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model
 AUTH_USER_MODEL = "store_app.User"
 
-# JWT settings
+# DRF settings
 REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': []
    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
 }
-
-ACCESS_TOKEN_LIFETIME = timedelta(hours=5)
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
+    'AUTH_TOKEN_CLASSES': ("rest_framework_simplejwt.tokens.AccessToken",)
+}
 
 #sesame settings
 AUTHENTICATION_BACKENDS = [
