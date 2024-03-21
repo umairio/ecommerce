@@ -18,7 +18,6 @@ from .serializers import (
     RegisterSerializer,
     ReviewSerializer,
     ShopSerializer,
-    UserSerializer,
 )
 
 
@@ -47,12 +46,6 @@ class ChangePasswordView(generics.UpdateAPIView):
             "data": [],
         }
         return Response(response)
-
-
-class UserViewSet(ModelViewSet):
-    serializer_class = UserSerializer
-    queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
 
 
 class ProfileViewSet(ModelViewSet):

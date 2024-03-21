@@ -6,7 +6,6 @@ from sesame.views import LoginView
 from . import views
 
 router = routers.DefaultRouter()
-router.register("user", views.UserViewSet),
 router.register("profile", views.ProfileViewSet)
 router.register("shop", views.ShopViewSet)
 router.register("order", views.OrderViewSet)

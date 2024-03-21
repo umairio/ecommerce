@@ -6,12 +6,6 @@ from .constants import ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop, User
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = "__all__"
-
-
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
