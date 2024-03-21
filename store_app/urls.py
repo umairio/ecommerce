@@ -8,11 +8,10 @@ from . import views
 router = routers.DefaultRouter()
 router.register("user", views.UserViewSet),
 router.register("profile", views.ProfileViewSet)
-router.register("shop1", views.ShopViewSet)
+router.register("shop", views.ShopViewSet)
 router.register("order", views.OrderViewSet)
 router.register("review", views.ReviewViewSet)
 router.register("product", views.ProductViewSet)
-router.register("category", views.CategoryViewSet)
 router.register("inventory", views.InventoryViewSet)
 
 urlpatterns = router.urls
@@ -26,9 +25,4 @@ urlpatterns = [
     path("api/login/refresh/", TokenRefreshView.as_view()),
     path("api/logout/", views.LogoutView.as_view(), name="logout"),
     path("api/change-password/", views.ChangePasswordView.as_view()),
-    path("api/shop-product/<int:pk>/", views.ShopProductView.as_view()),
-    path("api/shop-product/", views.ShopProductView.as_view()),
-    path("api/buyer-order/<int:pk>/", views.BuyerOrderView.as_view()),
-    path("api/buyer-order/", views.BuyerOrderView.as_view()),
-    path("api/sales-status/<int:pk>/", views.SalesStatusView.as_view())
 ]

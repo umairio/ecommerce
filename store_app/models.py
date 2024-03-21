@@ -4,6 +4,7 @@ from django.db import models
 from django.db.models import Avg
 from django.utils.translation import gettext_lazy as _
 
+from .constants import OrderStatus, ProfileRole
 from .managers import UserManager
 
 
@@ -22,12 +23,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Profile(models.Model):
-    class Role(models.TextChoices):
-        Admin = "admin"
-        Owner = "owner"
-        Buyer = "buyer"
-        Seller = "seller"
-
     user = models.OneToOneField(
         "User", verbose_name=_("user"), on_delete=models.CASCADE
     )
@@ -35,7 +30,10 @@ class Profile(models.Model):
         _("profile picture"), upload_to="profile_pics", blank=True
     )
     role = models.CharField(
-        _("role"), max_length=10, choices=Role.choices, default=Role.Buyer
+        _("role"),
+        max_length=10,
+        choices=ProfileRole.ROLE,
+        default=ProfileRole.BUYER,
     )
     phone_number = models.CharField(_("phone number"), max_length=15)
 
@@ -51,29 +49,27 @@ class Category(models.Model):
 
 
 class Order(models.Model):
-    class Status(models.TextChoices):
-        Cart = "cart"
-        Confirmed = "confirmed"
-        Shipped = "shipped"
-        Delivered = "delivered"
 
     buyer = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="buyer"
+        "Profile", on_delete=models.CASCADE, related_name="order_buyer"
     )
     seller = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="seller"
+        "Profile", on_delete=models.CASCADE, related_name="order_seller"
     )
     product = models.ForeignKey(
-        "Product", on_delete=models.CASCADE, related_name="order"
+        "Product", on_delete=models.CASCADE, related_name="order_product"
     )
     shop = models.ForeignKey(
-        "Shop", on_delete=models.CASCADE, related_name="order"
+        "Shop", on_delete=models.CASCADE, related_name="order_shop"
     )
     quantity = models.IntegerField(_("quantity"))
     total_amount = models.IntegerField(_("total amount"))
     shipping_address = models.TextField(_("shipping address"))
     status = models.CharField(
-        _("status"), max_length=10, choices=Status.choices, default=Status.Cart
+        _("status"),
+        max_length=10,
+        choices=OrderStatus.STATUS,
+        default=OrderStatus.CART,
     )
 
     def __str__(self):
@@ -82,13 +78,13 @@ class Order(models.Model):
 
 class Inventory(models.Model):
     shop = models.ForeignKey(
-        "Shop", on_delete=models.CASCADE, related_name="inventory"
+        "Shop", on_delete=models.CASCADE, related_name="inventory_shop"
     )
     product = models.ForeignKey(
-        "Product", on_delete=models.CASCADE, related_name="inventory"
+        "Product", on_delete=models.CASCADE, related_name="inventory_product"
     )
     seller = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="inventory"
+        "Profile", on_delete=models.CASCADE, related_name="inventory_seller"
     )
     total_quantity = models.IntegerField(_("total quantity"))
 
@@ -98,13 +94,16 @@ class Inventory(models.Model):
 
 class Review(models.Model):
     reviewer = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="review"
+        "Profile", on_delete=models.CASCADE, related_name="reviewer"
     )
     product = models.ForeignKey(
-        "Product", on_delete=models.CASCADE, related_name="review"
+        "Product", on_delete=models.CASCADE, related_name="reviewed_product"
     )
     order = models.OneToOneField(
-        "Order", on_delete=models.CASCADE, related_name="review", null=True
+        "Order",
+        on_delete=models.CASCADE,
+        related_name="reviewed_order",
+        null=True,
     )
     rating = models.IntegerField(_("rating"))
     comment = models.TextField(_("comment"))
@@ -118,19 +117,21 @@ class Product(models.Model):
     description = models.TextField(_("description"))
     price = models.IntegerField(_("price"))
     category = models.ForeignKey(
-        "Category", on_delete=models.CASCADE, related_name="product"
+        "Category", on_delete=models.CASCADE, related_name="product_category"
     )
     seller = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="product"
+        "Profile", on_delete=models.CASCADE, related_name="product_seller"
     )
     shop = models.ForeignKey(
-        "Shop", on_delete=models.CASCADE, related_name="product"
+        "Shop", on_delete=models.CASCADE, related_name="product_shop"
     )
 
     @property
     def rating(self):
-        average_rating = self.review.aggregate(Avg("rating"))["rating__avg"]
-        return round(average_rating, 2) if average_rating is not None else None
+        average_rating = self.reviewed_product.aggregate(Avg("rating"))[
+            "rating__avg"
+        ]
+        return round(average_rating, 2) if average_rating else average_rating
 
     def __str__(self):
         return self.name
@@ -138,16 +139,16 @@ class Product(models.Model):
 
 class Shop(models.Model):
     owner = models.ForeignKey(
-        "Profile", on_delete=models.CASCADE, related_name="shop"
+        "Profile", on_delete=models.CASCADE, related_name="owned_shops"
     )
     name = models.CharField(_("name"), max_length=50)
 
     @property
     def rating(self):
-        average_rating = self.product.aggregate(Avg("review__rating"))[
-            "review__rating__avg"
-        ]
-        return round(average_rating, 2) if average_rating is not None else None
+        average_rating = self.product_shop.aggregate(
+            Avg("reviewed_product__rating")
+        )["reviewed_product__rating__avg"]
+        return round(average_rating, 2) if average_rating else average_rating
 
     def __str__(self):
         return self.name

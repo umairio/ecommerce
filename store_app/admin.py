@@ -54,7 +54,7 @@ class OrderAdmin(admin.ModelAdmin):
     )
 
     def review_rating(self, obj):
-        return obj.review.rating
+        return obj.reviewed_order.rating
 
 
 class ShopAdmin(admin.ModelAdmin):

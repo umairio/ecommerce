@@ -6,19 +6,10 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import (
-    Category,
-    Inventory,
-    Order,
-    Product,
-    Profile,
-    Review,
-    Shop,
-    User,
-)
+from .constants import OrderStatus, ProfileRole
+from .models import Inventory, Order, Product, Profile, Review, Shop, User
 from .permissions import OwnerPermission, SellerPermission
 from .serializers import (
-    CategorySerializer,
     ChangePasswordSerializer,
     InventorySerializer,
     OrderSerializer,
@@ -40,36 +31,22 @@ class ChangePasswordView(generics.UpdateAPIView):
     model = User
     permission_classes = (IsAuthenticated,)
 
-    def get_object(self, queryset=None):
-        obj = self.request.user
-        return obj
+    def get_object(self):
+        return self.request.user
 
     def update(self, request, *args, **kwargs):
         self.object = self.get_object()
         serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            # Check old password
-            if not self.object.check_password(
-                serializer.data.get("old_password")
-            ):
-                return Response(
-                    {"old_password": ["Wrong password."]},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-            # set_password also hashes the password that the user will get
-            self.object.set_password(serializer.data.get("new_password"))
-            self.object.save()
-            response = {
-                "status": "success",
-                "code": status.HTTP_200_OK,
-                "message": "Password updated successfully",
-                "data": [],
-            }
-
-            return Response(response)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        self.object.set_password(serializer.data.get("new_password"))
+        self.object.save()
+        response = {
+            "status": "success",
+            "code": status.HTTP_200_OK,
+            "message": "Password updated successfully",
+            "data": [],
+        }
+        return Response(response)
 
 
 class UserViewSet(ModelViewSet):
@@ -95,11 +72,29 @@ class ProductViewSet(ModelViewSet):
     queryset = Product.objects.all()
     permission_classes = [IsAuthenticated]
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            sales_count = instance.order_product.count()
+            return Response(
+                {"product_id": instance.id, "sales_count": sales_count},
+                status=status.HTTP_200_OK,
+            )
+        except Product.DoesNotExist:
+            return Response(
+                "Product not found", status=status.HTTP_404_NOT_FOUND
+            )
 
-class CategoryViewSet(ModelViewSet):
-    serializer_class = CategorySerializer
-    queryset = Category.objects.all()
-    permission_classes = [IsAuthenticated]
+    def list(self, request, *args, **kwargs):
+        shop_id = request.query_params.get("shop_id", None)
+        if not shop_id:
+            return Response(
+                {"detail": "shop_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        queryset = Product.objects.filter(shop_id=shop_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class OrderViewSet(ModelViewSet):
@@ -107,17 +102,36 @@ class OrderViewSet(ModelViewSet):
     queryset = Order.objects.all()
     permission_classes = [IsAuthenticated]
 
+    def list(self, request, *args, **kwargs):
+        buyer_id = request.query_params.get("buyer_id")
+        if not buyer_id:
+            return Response(
+                {"detail": "buyer_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            buyer = Profile.objects.get(id=buyer_id, role=ProfileRole.BUYER)
+        except Profile.DoesNotExist:
+            return Response(
+                {"detail": "Invalid buyer_id."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        queryset = self.get_queryset().filter(buyer=buyer)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        if (
-            instance.status == Order.Status.Null
-            or instance.status == Order.Status.Cart
-        ):
+        if instance.status == OrderStatus.CART:
             self.perform_destroy(instance)
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                f"{instance} deleted", status=status.HTTP_204_NO_CONTENT
+            )
         else:
             return Response(
-                {"error": "Cannot delete confirmed orders"},
+                {"detail": "Cannot delete confirmed orders."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -161,49 +175,3 @@ class LogoutView(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-
-class ShopProductView(generics.ListAPIView):
-    serializer_class = ProductSerializer
-
-    def get_queryset(self):
-        pk = bool(self.kwargs)
-        if pk is True:
-            pk = self.kwargs["pk"]
-            return Product.objects.filter(shop=pk)
-        else:
-            owner = self.request.user.profile.id
-            shop = Shop.objects.get(owner=owner)
-            return Product.objects.filter(shop=shop)
-
-
-class BuyerOrderView(generics.ListAPIView):
-    serializer_class = OrderSerializer
-
-    def get_queryset(self):
-        pk = bool(self.kwargs)
-        if pk is True:
-            pk = self.kwargs["pk"]
-            return Order.objects.filter(buyer=pk)
-        else:
-            buyer = self.request.user.profile.id
-            return Order.objects.filter(buyer=buyer)
-
-
-class SalesStatusView(APIView):
-    permission_classes = [SellerPermission]
-
-    def get(self, request, pk, format=None):
-        try:
-            product = Product.objects.get(pk=pk)
-        except Product.DoesNotExist:
-            return Response(
-                {"detail": "Product not found."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        sales_count = product.order.count()
-        return Response(
-            {"product_id": product.id, "sales_count": sales_count},
-            status=status.HTTP_200_OK,
-        )
