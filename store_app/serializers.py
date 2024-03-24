@@ -2,7 +2,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-from .constants import ProfileRole
+from .constants import OrderStatus, ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop, User
 
 
@@ -13,6 +13,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Review
         fields = "__all__"
@@ -21,6 +22,13 @@ class ReviewSerializer(serializers.ModelSerializer):
         if attrs["rating"] > 5 or attrs["rating"] < 1:
             raise serializers.ValidationError("Rating must be between 1 and 5")
         return attrs
+
+    def validate_order(self, value):
+        if value.status != OrderStatus.DELIVERED:
+            raise serializers.ValidationError(
+                "Order must be in delivered first"
+            )
+        return value
 
 
 class ProductSerializer(serializers.ModelSerializer):

@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "django_extensions",
+    "shell_plus",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework_simplejwt",
     "rest_framework",

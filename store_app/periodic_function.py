@@ -2,39 +2,43 @@ import os
 import random
 from io import BytesIO
 
-from django.db.models import F
+from django.db.models import F, Sum
 from faker import Faker
 from reportlab.pdfgen import canvas
 
-from .models import Inventory, Order, Product, Profile, Review
+from .constants import OrderStatus, ProfileRole
+from .models import Inventory, Order, Product, Profile, Review, Shop
 
 fake = Faker()
 
 
-def shop_report(shop):
+def owner_report(owner):
     buffer = BytesIO()
     p = canvas.Canvas(buffer)
     row_height = 16
-    column_widths = [30, 165, 150, 130, 50, 100]
+    column_widths = [30, 170, 100]
     total_amount = 0
-
+    shop = Shop.objects.get(owner=owner)
     # Define the data to be printed in the table
     order_data = [
-        ["ID", "Buyer", "Seller", "Product", "Quantity", "Total"],
+        ["ID", "seller", "Total"],
     ]
-    for obj in Order.objects.filter(shop=shop):
+    seller_ids = set(
+        order.seller.id for order in Order.objects.filter(shop=shop.id)
+    )
+    for seller_id in seller_ids:
         order_data.append(
             [
-                obj.id,
-                obj.buyer.user.email,
-                obj.seller.user.email,
-                obj.product.name,
-                obj.quantity,
-                obj.total_amount,
+                seller_id,
+                Profile.objects.get(id=seller_id).user.email,
+                Order.objects.filter(seller_id=seller_id).aggregate(
+                    total=Sum("total_amount")
+                )["total"],
             ]
         )
-        total_amount += obj.total_amount
-
+        total_amount += Order.objects.filter(seller_id=seller_id).aggregate(
+            total=Sum("total_amount")
+        )["total"]
     # Define pagination variables
     page_height = 830
     max_rows_per_page = 50
@@ -44,12 +48,12 @@ def shop_report(shop):
     # Generate pages
     while current_row < len(order_data):
         # Set up the page
-        p.drawString(0, page_height, f"Page {current_page}")
+        p.drawString(0, page_height, f"Owner: {shop.owner} - Shop: {shop.name}")
 
         # Draw rows on the page
         x = 10
         y = page_height - 20
-        for row in order_data[current_row: current_row + max_rows_per_page]:
+        for row in order_data[current_row:current_row + max_rows_per_page]:
             for i in range(len(row)):
                 p.drawString(x, y, str(row[i]))
                 x += column_widths[i]
@@ -70,7 +74,7 @@ def shop_report(shop):
     pdf_bytes = buffer.getvalue()
 
     # Save the PDF file locally
-    pdf_path = os.path.join("reports/shop", f"shop_{shop}_data.pdf")
+    pdf_path = os.path.join("reports/owner", f"Owner {owner}_data.pdf")
     with open(pdf_path, "wb") as f:
         f.write(pdf_bytes)
 
@@ -115,7 +119,7 @@ def seller_report(seller):
         # Draw rows on the page
         x = 10
         y = page_height - 20
-        for row in order_data[current_row: current_row + max_rows_per_page]:
+        for row in order_data[current_row:current_row + max_rows_per_page]:
             for i in range(len(row)):
                 p.drawString(x, y, str(row[i]))
                 x += column_widths[i]
@@ -153,7 +157,7 @@ def buy_items():
         quantity = random.randint(
             1, Inventory.objects.get(product=product).total_quantity
         )
-        buyer = random.choice(Profile.objects.filter(role=Profile.Role.Buyer))
+        buyer = random.choice(Profile.objects.filter(role=ProfileRole.BUYER))
         order = Order.objects.create(
             buyer=buyer,
             product=product,
@@ -162,7 +166,7 @@ def buy_items():
             seller=product.seller,
             total_amount=product.price * quantity,
             shipping_address=fake.address(),
-            status=Order.Status.Delivered,
+            status=OrderStatus.DELIVERED,
         )
         Review.objects.create(
             order=order,

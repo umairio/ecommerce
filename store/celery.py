@@ -13,8 +13,8 @@ app.config_from_object(settings, namespace="CELERY")
 app.conf.beat_schedule = {
     "buy": {"task": "store_app.tasks.buy_items_from_shop", "schedule": 1},
     "add_stock": {"task": "store_app.tasks.add_stock", "schedule": 1},
-    "daily_sale_report": {
-        "task": "store_app.tasks.generate_shop_report",
+    "daily_owner_report": {
+        "task": "store_app.tasks.generate_owner_report",
         "schedule": crontab(hour=0),
     },
     "daily_seller_report": {

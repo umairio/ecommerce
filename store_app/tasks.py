@@ -1,8 +1,8 @@
 from celery import shared_task
 from django.db.models import F
 
-from .models import Inventory, Profile, Shop
-from .periodic_function import buy_items, seller_report, shop_report
+from .models import Inventory, Profile
+from .periodic_function import buy_items, owner_report, seller_report
 
 
 @shared_task(bind=True)
@@ -18,9 +18,9 @@ def add_stock(self):
 
 
 @shared_task(bind=True)
-def generate_shop_report(self):
-    for shop in Shop.objects.all():
-        shop_report(shop.id)
+def generate_owner_report(self):
+    for owner in Profile.objects.filter(role="owner"):
+        owner_report(owner.id)
 
 
 @shared_task(bind=True)

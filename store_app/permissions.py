@@ -1,12 +1,11 @@
 from rest_framework import permissions
 
 from .constants import ProfileRole
-from .models import Profile
 
 
-class OwnerPermission(permissions.BasePermission):
+class IsOwner(permissions.BasePermission):
     def has_permission(self, request, view):
-        if (
+        if request.user.is_authenticated and (
             request.user.profile.role == ProfileRole.OWNER
             or request.user.profile.role == ProfileRole.ADMIN
         ):
@@ -14,8 +13,21 @@ class OwnerPermission(permissions.BasePermission):
         return False
 
 
-class SellerPermission(permissions.BasePermission):
+class IsSeller(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.user.profile.role != Profile.Role.BUYER:
+        if (
+            request.user.is_authenticated
+            and request.user.profile.role != ProfileRole.BUYER
+        ):
+            return True
+        return False
+
+
+class IsBuyer(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if (
+            request.user.is_authenticated
+            and request.user.profile.role == ProfileRole.BUYER
+        ):
             return True
         return False

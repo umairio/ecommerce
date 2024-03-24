@@ -24,7 +24,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(
-        "User", verbose_name=_("user"), on_delete=models.CASCADE
+        "User",
+        verbose_name=_("user"),
+        on_delete=models.CASCADE,
+        related_name="profile",
     )
     profile_pic = models.ImageField(
         _("profile picture"), upload_to="profile_pics", blank=True
