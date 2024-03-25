@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "django_extensions",
-    "shell_plus",
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework_simplejwt",
     "rest_framework",
@@ -152,11 +151,6 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ("rest_framework_simplejwt.tokens.AccessToken",)
 }
 
-#sesame settings
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "sesame.backends.ModelBackend",
-]
 
 #Celer
 CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
