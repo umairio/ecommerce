@@ -1,0 +1,42 @@
+**Create ERD:**
+
+- **Email Sending Task:** Asynchronous task for sending emails for order confirmations, password reset links, password Update etc.
+- **Scheduled Tasks:** Tasks for scheduled activities like generating sales reports, generate sales etc.✅
+    - Each shop Sale report for a week (reportlab)✅
+    - Seller Weekly sale report. (reportlab)✅
+    - Task to do shopping (daily)✅
+    - Inventory add task (after above task ran)✅
+
+**APIs**
+
+**User Authentication:**
+
+- User registration✅
+- User login✅
+- User logout✅
+- User profile Update✅
+- Password Change✅
+- Password reset / Invite User to system
+
+**Generic APIs**
+
+**For Buyer**
+
+- Get all shops✅
+- Get items in a shop✅
+- Buy something from shop✅
+- Get my orders✅
+- delete order if not confirmed.✅
+
+**For seller**
+
+- Update Inventory of a product✅
+- Process order for a customer✅
+- request owner to add self into the shop (send mail)
+- check sales status for a product✅
+
+**For Owner**
+
+- Add seller to the shop✅
+- Check sales status for all sellers✅
+```
