@@ -1,7 +1,6 @@
 from django.urls import include, path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from sesame.views import LoginView
 
 from . import views
 
@@ -20,7 +19,6 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path("api/register/", views.RegisterView.as_view(), name="register"),
     path("api/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("login/", LoginView.as_view(), name="login"),
     path("api/login/refresh/", TokenRefreshView.as_view()),
     path("api/logout/", views.LogoutView.as_view(), name="logout"),
     path("api/change-password/", views.ChangePasswordView.as_view()),

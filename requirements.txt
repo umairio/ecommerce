@@ -14,3 +14,4 @@ flake8
 isort
 pre-commit
 reportlab
+django_extensions

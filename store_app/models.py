@@ -41,7 +41,7 @@ class Profile(models.Model):
     phone_number = models.CharField(_("phone number"), max_length=15)
 
     def __str__(self):
-        return self.user.email
+        return self.user.email +  f"({self.role})"
 
 
 class Category(models.Model):
