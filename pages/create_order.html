@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="form_wrapper">
+      <div class="form_container">
+        <div class="title_container">
+          <h2>Place Order</h2>
+        </div>
+
+        <div class="row clearfix">
+          <div>
+            <form id="OrderForm">
+              <div class="input_field">
+                <input type="number" 
+                name="id" 
+                placeholder="Product ID" 
+                required />
+              </div>
+
+              <div class="input_field">
+                <input
+                  type="number"
+                  name="quantity"
+                  placeholder="Quantity"
+                  required
+                />
+              </div>
+
+              <label for="cars">Choose a car:</label>
+              <select id="cars" name="cars">
+                <option value="volvo">Volvo</option>
+                <option value="saab">Saab</option>
+                <option value="fiat">Fiat</option>
+                <option value="audi">Audi</option>
+              </select>
+              
+
+              <input class="button" type="submit" value="Confirm Order" />
+
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="message" style="display: none">Order Created successfully!</div>
+      </div>
+    </div>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+      document
+        .getElementById("OrderForm")
+        .addEventListener("submit", function (event) {
+          event.preventDefault();
+          var formData = new FormData(this);
+          fetch("http://127.0.0.1:8000/api/register/", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => {
+              if (response.ok) {
+                document.getElementById("message").style.display = "block";
+                setTimeout(function () {
+                  window.location.href = "login.html";
+                }, 1000);
+                return response.json();
+              } else {
+                throw new Error("Registration failed");
+              }
+            })
+            .then((data) => {
+              alert("Registration successful!");
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+              alert("Registration failed. Please try again.");
+            });
+        });
+    </script>
+  </body>
+</html>

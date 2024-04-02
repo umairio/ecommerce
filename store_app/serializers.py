@@ -1,4 +1,3 @@
-from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -91,7 +90,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     )
 
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password]
+        write_only=True,
+        required=True,
     )
     password2 = serializers.CharField(write_only=True, required=True)
 
@@ -131,7 +131,7 @@ class ChangePasswordSerializer(serializers.Serializer):
                 {"old_password": ["Wrong password."]}
             )
 
-        validate_password(new_password)
+        # validate_password(new_password)
         return attrs
 
     def validate_new_password(self, value):

@@ -1,9 +1,11 @@
-#management command to create fake data
+# import random
+
 from django.core.management.base import BaseCommand
-from store_app.models import *
 from faker import Faker
-import random
-from store_app.constants import ProfileRole
+
+# from store_app.constants import ProfileRole
+from store_app.models import *
+
 fake = Faker("en_US")
 
 
@@ -25,23 +27,29 @@ class Command(BaseCommand):
         # for _ in range(7):
         #     Shop.objects.create(
         #         name=fake.word(),
-        #         owner= random.choice(Profile.objects.filter(role=ProfileRole.OWNER)),
+        #         owner=random.choice(
+        #             Profile.objects.filter(role=ProfileRole.OWNER)
+        #         ),
         #     )
         # for _ in range(50):
-        #     shop = (Shop.objects.all().order_by("?").first())
-        #     seller = (Profile.objects.filter(role=ProfileRole.SELLER).order_by("?").first())
+        #     shop = Shop.objects.all().order_by("?").first()
+        #     seller = (
+        #         Profile.objects.filter(role=ProfileRole.SELLER)
+        #         .order_by("?")
+        #         .first()
+        #     )
         #     p = Product.objects.create(
-        #         #capitalize it
+        #         # capitalize it
         #         name=fake.word().capitalize(),
         #         price=random.randint(100, 1000),
         #         shop=shop,
         #         seller=seller,
-        #         category=(Category.objects.all().order_by("?").first())
+        #         category=(Category.objects.all().order_by("?").first()),
         #     )
         #     Inventory.objects.create(
         #         product=p,
         #         total_quantity=random.randint(1, 10),
         #         shop=p.shop,
-        #         seller=p.seller
+        #         seller=p.seller,
         #     )
         return

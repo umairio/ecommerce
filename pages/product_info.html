@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Products</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid d-flex justify-content-start gap-3">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarText"
+          aria-controls="navbarText"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="products.html">Products</a>
+              <a class="nav-link" href="profile.html">Profile</a>
+              <a class="nav-link" href="orders.html">Orders</a>
+              <a class="nav-link" href="reviews.html">Reviews</a>
+            </li>
+            <li><hr class="dropdown-divider border border-light" /></li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://127.0.0.1:8000/admin"
+                >Django Admin</a
+              >
+            </li>
+          </ul>
+        </div>
+        <a class="navbar-brand" href="/home">Home</a>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h2>Product Information</h2>
+      <div id="product-info">
+      </div>
+      <button id="create-order-btn" class="btn btn-primary">Create Order</button>
+    </div>
+
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+
+      fetch(`http://127.0.0.1:8000/api/product/${productId}`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((product) => {
+          const productInfoContainer = document.getElementById("product-info");
+          productInfoContainer.innerHTML = `
+                <p><strong>ID:</strong> ${product.id}</p>
+                <p><strong>Name:</strong> ${product.name}</p>
+                <p><strong>Description:</strong> ${product.description}</p>
+                <p><strong>Category:</strong> ${product.category}</p>
+                <p><strong>Sales Count:</strong> ${product.sales_count}</p>
+                <p><strong>Rating:</strong> ${product.rating}</p>
+                <p><strong>Price:</strong> ${product.price}</p>
+                <p><strong>Shop:</strong> ${product.shop}</p>
+                <p><strong>Seller:</strong> ${product.seller}</p>
+                <p><strong>Price:</strong> ${product.price}</p>
+                `;
+          const createOrderBtn = document.getElementById("create-order-btn");
+          createOrderBtn.addEventListener("click", () => {
+            // Redirect to the order creation page with the product ID
+            window.location.href = `http://127.0.0.1:8000/order/?product_id=${product.id}`;
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching product information:", error);
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>

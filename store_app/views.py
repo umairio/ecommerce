@@ -31,6 +31,9 @@ class ChangePasswordView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         self.object = self.request.user
+        print("=========")
+        print(request.data)
+        print("=========")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.object.set_password(serializer.validated_data["new_password"])
@@ -64,9 +67,7 @@ class ProfileViewSet(ModelViewSet):
         instance = self.get_object()
         if instance.user != request.user:
             return Response(
-                {
-                    "detail": "This is not your profile."
-                },
+                {"detail": "This is not your profile."},
                 status=status.HTTP_403_FORBIDDEN,
             )
         serializer = self.get_serializer(instance, data=data, partial=True)
@@ -81,9 +82,7 @@ class ProfileViewSet(ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         else:
             return Response(
-                {
-                    "detail": "This is not your profile."
-                },
+                {"detail": "This is not your profile."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -139,7 +138,18 @@ class ProductViewSet(ModelViewSet):
             instance = self.get_object()
             sales_count = instance.order_product.count()
             return Response(
-                {"product_id": instance.id, "sales_count": sales_count},
+                {
+                    "id": instance.id,
+                    "name": instance.name,
+                    "description": instance.description,
+                    'category': instance.category.name,
+                    "sales_count": sales_count,
+                    "rating": instance.rating,
+                    'shop': instance.shop.name,
+                    'seller': instance.seller.user.email,
+                    'price': instance.price,
+                    
+                },
                 status=status.HTTP_200_OK,
             )
         except Product.DoesNotExist:
