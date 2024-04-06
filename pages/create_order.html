@@ -15,6 +15,38 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid d-flex justify-content-start gap-3">
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarText"
+          aria-controls="navbarText"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="products.html">Products</a>
+              <a class="nav-link" href="profile.html">Profile</a>
+              <a class="nav-link" href="orders.html">Orders</a>
+              <a class="nav-link" href="reviews.html">Reviews</a>
+            </li>
+            <li><hr class="dropdown-divider border border-light" /></li>
+            <li class="nav-item">
+              <a class="nav-link" href="http://127.0.0.1:8000/admin"
+                >Django Admin</a
+              >
+            </li>
+          </ul>
+        </div>
+        <a class="navbar-brand" href="products.html">Home</a>
+      </div>
+    </nav>
     <div class="form_wrapper">
       <div class="form_container">
         <div class="title_container">
@@ -25,70 +57,43 @@
           <div>
             <form id="OrderForm">
               <div class="input_field">
-                <input type="number" 
-                name="id" 
-                placeholder="Product ID" 
-                required />
-              </div>
-
-              <div class="input_field">
                 <input
                   type="number"
-                  name="quantity"
-                  placeholder="Quantity"
-                  required
+                  name="id"
+                  placeholder="Product ID"
                 />
               </div>
 
-              <label for="cars">Choose a car:</label>
-              <select id="cars" name="cars">
-                <option value="volvo">Volvo</option>
-                <option value="saab">Saab</option>
-                <option value="fiat">Fiat</option>
-                <option value="audi">Audi</option>
-              </select>
-              
-
-              <input class="button" type="submit" value="Confirm Order" />
-
+              <class="input_field">
+                <input
+                  type="number"
+                  name="quantity"
+                  id="quantityInput"
+                  placeholder="Quantity"
+                  required
+                  onchange="updateTotal()"
+                />
+                <span>Total amount: <span id="totalAmount">0</span></span>
               </div>
+              <input class="button" type="submit" value="   " />
             </form>
           </div>
         </div>
-        <div id="message" style="display: none">Order Created successfully!</div>
       </div>
     </div>
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get("id");
-      document
-        .getElementById("OrderForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-          var formData = new FormData(this);
-          fetch("http://127.0.0.1:8000/api/register/", {
-            method: "POST",
-            body: formData,
-          })
-            .then((response) => {
-              if (response.ok) {
-                document.getElementById("message").style.display = "block";
-                setTimeout(function () {
-                  window.location.href = "login.html";
-                }, 1000);
-                return response.json();
-              } else {
-                throw new Error("Registration failed");
-              }
-            })
-            .then((data) => {
-              alert("Registration successful!");
-            })
-            .catch((error) => {
-              console.error("Error:", error);
-              alert("Registration failed. Please try again.");
-            });
-        });
+      const quantity = urlParams.get("quantity");
+      const quantityInput = document.getElementById("quantityInput");
+      const totalAmountElement = document.getElementById("totalAmount");
+      async function updateTotal(quantity) {
+            const product = await get_product_info(productId);
+            const price = product.price;
+            const totalAmount = price * quantity;
+            document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
+        }
+
     </script>
   </body>
 </html>

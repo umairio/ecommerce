@@ -10,6 +10,8 @@
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     />
+    <link rel="stylesheet" href="style.css" />
+    <script src="func.js"></script>
   </head>
 
   <body>
@@ -50,21 +52,27 @@
       <h2>Product Information</h2>
       <div id="product-info">
       </div>
-      <button id="create-order-btn" class="btn btn-primary">Create Order</button>
+      <form id="OrderForm">
+        <div class="input_field">
+          <input
+            type="number"
+            name="quantity"
+            id="quantityInput"
+            placeholder="Quantity"
+            required
+            onchange="updateTotal()"
+          />
+          <span>Total amount: <span id="totalAmount">0</span></span>
+          <button id="buy-now-btn" class="btn btn-primary">Buy Now</button>
+        </div>
+      </form>
     </div>
 
     <script>
       const urlParams = new URLSearchParams(window.location.search);
       const productId = urlParams.get("id");
 
-      fetch(`http://127.0.0.1:8000/api/product/${productId}`, {
-        method: "GET",
-        headers: {
-          Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          "Content-Type": "application/json",
-        },
-      })
-        .then((response) => response.json())
+        get_product_info(productId)
         .then((product) => {
           const productInfoContainer = document.getElementById("product-info");
           productInfoContainer.innerHTML = `
@@ -79,15 +87,19 @@
                 <p><strong>Seller:</strong> ${product.seller}</p>
                 <p><strong>Price:</strong> ${product.price}</p>
                 `;
-          const createOrderBtn = document.getElementById("create-order-btn");
-          createOrderBtn.addEventListener("click", () => {
-            // Redirect to the order creation page with the product ID
-            window.location.href = `http://127.0.0.1:8000/order/?product_id=${product.id}`;
+              })
+          .catch((error) => {
+            console.error("Error fetching product information:", error);
           });
-        })
-        .catch((error) => {
-          console.error("Error fetching product information:", error);
-        });
+          async function updateTotal() {
+            const quantity = document.getElementById("quantityInput").value;
+            const product = await get_product_info(productId);
+            const price = product.price;
+            const totalAmount = price * quantity;
+            document.getElementById("totalAmount").textContent = totalAmount.toFixed(2);
+        }
+
+        document.getElementById("buy-now-btn");
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

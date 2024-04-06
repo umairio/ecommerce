@@ -72,7 +72,7 @@ class Order(models.Model):
         _("status"),
         max_length=10,
         choices=OrderStatus.STATUS,
-        default=OrderStatus.CART,
+        default=OrderStatus.CONFIRMED,
     )
 
     def __str__(self):
