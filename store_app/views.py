@@ -1,11 +1,16 @@
+from django.db.models import F
 from django.shortcuts import render
 from rest_framework import generics, mixins, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import (
+    GenericViewSet,
+    ModelViewSet,
+    ReadOnlyModelViewSet,
+)
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.db.models import F
+
 from .constants import OrderStatus, ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop, User
 from .permissions import IsBuyer, IsOwner, IsSeller
@@ -18,6 +23,7 @@ from .serializers import (
     RegisterSerializer,
     ReviewSerializer,
     ShopSerializer,
+    UserSerializer,
 )
 
 
@@ -39,6 +45,11 @@ class ChangePasswordView(generics.UpdateAPIView):
             {"message": "Password updated successfully"},
             status=status.HTTP_200_OK,
         )
+
+
+class UserViewSet(ReadOnlyModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
 
 
 class ProfileViewSet(ModelViewSet):
@@ -87,7 +98,6 @@ class ProfileViewSet(ModelViewSet):
 class ReviewViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
-    mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     GenericViewSet,
 ):
@@ -102,6 +112,7 @@ class ReviewViewSet(
         order = request.data.get("order")
         user = request.user
         if Order.objects.filter(id=order, buyer__user__email=user).exists():
+            request.data["product"] = Order.objects.get(id=order).product.id
             return super().create(request, *args, **kwargs)
         else:
             return Response(
@@ -113,6 +124,16 @@ class ReviewViewSet(
         self.permission_classes = [IsOwner]
         self.check_permissions(request)
         return super().destroy(request, *args, **kwargs)
+
+    def list(self, request, *args, **kwargs):
+        productId = request.query_params.get("product")
+        orderId = request.query_params.get("order")
+        if orderId:
+            self.queryset = self.queryset.filter(order=orderId)
+        if productId:
+            self.queryset = self.queryset.filter(product=productId)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
+        return Response(serializer.data)
 
 
 class ProductViewSet(ModelViewSet):
@@ -139,13 +160,12 @@ class ProductViewSet(ModelViewSet):
                     "id": instance.id,
                     "name": instance.name,
                     "description": instance.description,
-                    'category': instance.category.name,
+                    "category": instance.category.name,
                     "sales_count": sales_count,
                     "rating": instance.rating,
-                    'shop': instance.shop.name,
-                    'seller': instance.seller.user.email,
-                    'price': instance.price,
-                    
+                    "shop": instance.shop.name,
+                    "seller": instance.seller.user.email,
+                    "price": instance.price,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -177,6 +197,7 @@ class OrderViewSet(
     mixins.CreateModelMixin,
     mixins.UpdateModelMixin,
     mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
     serializer_class = OrderSerializer
@@ -190,7 +211,7 @@ class OrderViewSet(
         quantity = request.data.get("quantity")
         product = Product.objects.get(id=product)
         item_stock = Inventory.objects.get(product=product.id).total_quantity
-        if  item_stock < int(quantity):
+        if item_stock < int(quantity):
             return Response(
                 "Insufficient stock", status=status.HTTP_400_BAD_REQUEST
             )
@@ -201,6 +222,7 @@ class OrderViewSet(
         request.data["seller"] = product.seller.id
         request.data["shop"] = product.shop.id
         return super().create(request, *args, **kwargs)
+
     def list(self, request, *args, **kwargs):
         user = request.user
         if user.profile.role == ProfileRole.BUYER:
@@ -223,6 +245,26 @@ class OrderViewSet(
             queryset = self.get_queryset().filter(buyer=buyer)
             serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, *args, **kwargs):
+        user = User.objects.get(email=request.user)
+        instance = self.get_object()
+        if user.profile.role == ProfileRole.BUYER:
+            if instance.buyer == user.profile:
+                return super().retrieve(request, *args, **kwargs)
+        if user.profile.role == ProfileRole.SELLER:
+            if instance.seller == user.profile:
+                return super().retrieve(request, *args, **kwargs)
+        if user.profile.role == ProfileRole.OWNER:
+            if instance.shop.owner == user.profile:
+                return super().retrieve(request, *args, **kwargs)
+        if user.profile.role == ProfileRole.ADMIN:
+            return super().retrieve(request, *args, **kwargs)
+        else:
+            return Response(
+                {"detail": "Cannot view orders not belonging to you."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
