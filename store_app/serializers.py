@@ -46,16 +46,10 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-    def validate(self, attrs):
-        buyer = attrs.get("buyer")
-        seller = attrs.get("seller")
-        if buyer.profile.role != ProfileRole.Buyer:
-            raise serializers.ValidationError(f"{buyer} is not a buyer")
-        if seller.profile.role != ProfileRole.Seller:
-            raise serializers.ValidationError(f"{seller} is not a seller")
-        if attrs["quantity"] <= 0:
+    def validate_quantity(self, value):
+        if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
-        return attrs
+        return value
 
 
 class ShopSerializer(serializers.ModelSerializer):

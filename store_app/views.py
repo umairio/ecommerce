@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from django.db.models import F
 from .constants import OrderStatus, ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop, User
 from .permissions import IsBuyer, IsOwner, IsSeller
@@ -31,9 +31,6 @@ class ChangePasswordView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         self.object = self.request.user
-        print("=========")
-        print(request.data)
-        print("=========")
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.object.set_password(serializer.validated_data["new_password"])
@@ -191,12 +188,19 @@ class OrderViewSet(
         self.check_permissions(request)
         product = request.data.get("product")
         quantity = request.data.get("quantity")
-        if Inventory.objects.get(product=product).total_quantity < quantity:
+        product = Product.objects.get(id=product)
+        item_stock = Inventory.objects.get(product=product.id).total_quantity
+        if  item_stock < int(quantity):
             return Response(
                 "Insufficient stock", status=status.HTTP_400_BAD_REQUEST
             )
+        Inventory.objects.filter(product=product).update(
+            total_quantity=F("total_quantity") - quantity
+        )
+        request.data["buyer"] = request.user.id
+        request.data["seller"] = product.seller.id
+        request.data["shop"] = product.shop.id
         return super().create(request, *args, **kwargs)
-
     def list(self, request, *args, **kwargs):
         user = request.user
         if user.profile.role == ProfileRole.BUYER:
