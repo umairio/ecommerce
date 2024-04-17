@@ -57,6 +57,12 @@ class ProfileViewSet(ModelViewSet):
     queryset = Profile.objects.all()
     permission_classes = [IsAuthenticated]
 
+    def list(self, request, *args, **kwargs):
+        userId = request.query_params.get("user")
+        if userId:
+            self.queryset = self.queryset.filter(user=userId)
+        return super().list(request, *args, **kwargs)
+
     def create(
         self, request, *args, **kwargs
     ):  # for creating own profile not else
@@ -427,3 +433,12 @@ class LogoutView(APIView):
             return Response(
                 {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class AuthUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        serializer = UserSerializer(user)
+        return Response(serializer.data)

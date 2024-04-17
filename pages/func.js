@@ -79,4 +79,38 @@ const get_shop_info = async (shopId) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
+const get_profile_by_user = async (userId) => {
+  try {
+    const res = await fetch(
+      `http://127.0.0.1:8000/api/profile/?user=${userId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const data = res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const request_user = async () => {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/authuser/`, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        "Content-Type": "application/json",
+      },
+    });
+    const data = res.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
