@@ -42,7 +42,7 @@
           </li>
         </ul>
       </div>
-      <a class="navbar-brand" href="/home">Home</a>
+      <a class="navbar-brand" href=/home/umairio/Desktop/ecommerce/pages/>Home</a>
     </div>
   </nav>
 
@@ -134,12 +134,10 @@
             const reviewDiv = document.createElement("div");
             reviewDiv.classList.add("review");
             reviewDiv.innerHTML = `
-              <div class="card" style="width: 35rem; margin-bottom: 8px; padding: 1px; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
-                <div class="card-body">
-                  <h5 class="card-title">${user.email}</h5>
-                  <h6 class="card-subtitle mb-2 text-muted">Rating: ${review.rating}</h6>
+              <div class="card" style="width: 35rem; margin-bottom: 10px; padding: 5px; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+                  <p class="card-title">${user.email}</p>
+                  <p class="card-subtitle mb-2 text-muted">Rating: ${review.rating}</p>
                   <p class="card-text">${review.comment}</p>
-                </div>
               </div>
 
             `;
