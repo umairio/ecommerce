@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link rel="stylesheet" href="formstyle.css" />
+  <script src="func.js"></script>
+</head>
+
+<body>
+  <div class="form_wrapper">
+    <div class="form_container">
+      <div class="title_container">
+        <h2>Create Profile</h2>
+      </div>
+      <div class="row clearfix">
+        <div>
+          <form id="ProfileForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email"  readonly>
+                <div id="emailHelp" class="form-text">Email cannot be changed.</div>
+            </div>
+            <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" aria-describedby="phoneHelp">
+                <div id="phoneHelp" class="form-text">Enter your phone number.</div>
+            </div>
+            <div class="mb-3">
+                <label for="role" class="form-label">What are you</label>
+                <input type="text" name="role"  class="form-control" id="role" options="buyer,seller">
+            </div>
+            <input class="button" type="submit" value="Confirm Profile" />
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+      
+  </script>
+</body>
+
+</html>

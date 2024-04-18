@@ -10,6 +10,7 @@
     integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="formstyle.css" />
+  <script src="func.js"></script>
 </head>
 
 <body>
@@ -53,7 +54,6 @@
       .addEventListener("submit", function (event) {
         event.preventDefault();
         var formData = new FormData(this);
-        console.log(formData);
         fetch("http://127.0.0.1:8000/api/login/", {
           method: "POST",
           body: formData,
@@ -71,15 +71,35 @@
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", refreshToken);
             document.getElementById("loginMessage").style.display = "block";
-            setTimeout(function () {
-              window.location.href = "products.html";
-            }, 1000);
+            setTimeout(loggedin_redirect(), 1000);
           })
           .catch((error) => {
             console.error("Error:", error);
             alert("Login failed. wrong credentials.");
           });
       });
+    const loggedin_redirect = async () => {
+      request_user()
+        .then((user) => {
+          get_profile_by_user(user.id)
+            .then((profile) => {
+              if (profile.length === 0) {
+                window.location.href = "create_profile.html";
+              } else {
+                profile = profile[0]
+                if (profile.role === "ADMIN") {
+                  window.location.href = "products.html";
+                } else if (profile.role === "seller") {
+                  window.location.href = "seller.html";
+                } else if (profile.role === "buyer") {
+                  window.location.href = "products.html";
+                } else if (profile.role === "owner") {
+                  window.location.href = "products.html";
+                }
+              };
+            })
+        })
+    }
   </script>
 </body>
 

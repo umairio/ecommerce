@@ -20,7 +20,7 @@
             </div>
             <div class="row clearfix">
                 <div>
-                    <form id="edit-profile-form">
+                    <form id="edit-profile-form" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email address</label>
                             <input type="email" class="form-control" id="email" aria-describedby="emailHelp" readonly>
@@ -31,17 +31,13 @@
                             <input type="text" class="form-control" id="phone" aria-describedby="phoneHelp">
                             <div id="phoneHelp" class="form-text">Enter your phone number.</div>
                         </div>
-                        <div class="mb-3">
-                            <label for="profile-pic" class="form-label">Profile Picture</label>
-                            <input type="file" class="form-control" id="profile-pic" accept="image/*">
-                        </div>
                         <input class="button" type="submit" value="Save Changes" />
                     </form>
                 </div>
             </div>
             <div id="loginMessage" style="display: none">
                 <p>Profile updated successfully</p>
-              </div>
+            </div>
         </div>
     </div>
 
@@ -51,36 +47,35 @@
         document.getElementById("edit-profile-form").addEventListener("submit", function (event) {
             event.preventDefault();
             let phone = document.getElementById("phone").value;
-            let profilePic = document.getElementById("profile-pic").files[0];
-            console.log(phone, profilePic);
             request_user()
                 .then(user => {
-                    fetch(`http://127.0.0.1:8000/api/profile/${user.id}/`, {
-                        method: "PATCH",
-                        body: JSON.stringify({
-                            phone_number: phone,
-                            profile_pic: profilePic,
-                        }),
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-                        }
-                    })
-                        .then((response) => {
-                            if (response.ok) {
-                                document.getElementById("loginMessage").style.display = "block";
-                                setTimeout(function () {
-                                    window.location.href = "profile.html";
-                                }, 1000);
-                                return response.json();
-                            } else {
-                                throw new Error("Profile update failed");
+                    get_profile_by_user(user.id).then(profile => {
+
+                        const formData = new FormData();
+                        formData.append("phone_number", phone);
+                        profile = profile[0];
+                        fetch(`http://127.0.0.1:8000/api/profile/${profile.id}/`, {
+                            method: "PATCH",
+                            body: formData,
+                            headers: {
+                                Authorization: "Bearer " + localStorage.getItem("accessToken"),
                             }
                         })
-                        .catch((error) => {
-                            console.error("Error:", error);
-                            alert(error);
-                        });
+                            .then((response) => {
+                                if (response.ok) {
+                                    document.getElementById("loginMessage").style.display = "block";
+                                    setTimeout(function () {
+                                        window.location.href = "profile.html";
+                                    }, 1000);
+                                    return response.json();
+                                } else {
+                                    throw new Error("Profile update failed");
+                                }
+                            })
+                            .catch((error) => {
+                                alert(error);
+                            });
+                    })
                 })
         })
         request_user()
@@ -96,6 +91,8 @@
                 document.getElementById("email").value = user.email;
                 get_profile_by_user(userId).then(profile => {
                     document.getElementById("phone").value = profile[0].phone_number;
+                    document.getElementById("profile-pic").filename = profile[0].profile_pic;
+                    console.log(profile[0].profile_pic);
                 })
                     .catch(error => {
                         console.error('Error fetching profile:', error);

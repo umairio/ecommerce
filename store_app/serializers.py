@@ -12,9 +12,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False)
     class Meta:
         model = Profile
-        fields = "__all__"
+        fields = ["id", "user", "profile_pic", "role", "phone_number"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):

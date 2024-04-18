@@ -16,6 +16,44 @@
         body {
             font-family: "Montserrat";
         }
+
+        #profile-pic-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        #profile-pic-overlay {
+            margin-left: 12px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+            width: 200px;
+            height: 200px;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.4s ease-in;
+            cursor: pointer;
+        }
+
+        #profile-pic-overlay:hover {
+            opacity: 0.8;
+        }
+
+        #edit-profile-pic-label {
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        #profile-pic {
+            object-fit: cover;
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 
@@ -33,7 +71,7 @@
                         <a class="nav-link" href="products.html">Products</a>
                         <a class="nav-link" href="profile.html">Profile</a>
                         <a class="nav-link" href="orders.html">Orders</a>
-                        <a class="nav-link" href="reviews.html">Reviews</a>
+                        <a class="nav-link" href="logout.html">Logout</a>
                         <hr class="dropdown-divider border border-light" />
                         <a class="nav-link" href="http://127.0.0.1:8000/admin">Django Admin</a>
                     </li>
@@ -45,10 +83,16 @@
     <div class="container">
         <h2 style="margin: 10px;">Profile</h2>
         <div class="row">
-            <div class="col-md-6" id="profile-info">
+            <div class="col-md-6" id="profile-info" style="margin-top: 2rem;">
             </div>
-            <div class="col-md-6" id="profile-pic">
+            <div class="col-md-6" id="profile-pic-container">
+                <div id="profile-pic-overlay" onclick="triggerFileInput()">
+                    <label id="edit-profile-pic-label">✏️</label>
+                </div>
+                <img id="profile-pic" src="" alt="Profile Picture">
             </div>
+            <input type="file" id="profile-pic-input" accept="image/*" style="display: none;"
+                onchange="updateProfilePic()">
         </div>
         <div id="edit-profile"></div>
     </div>
@@ -69,7 +113,7 @@
         };
 
         function populate_profile_div(userId) {
-        var userEmail;
+            var userEmail;
             userEmail = get_user_info(userId).then(user => {
                 userEmail = user.email;
                 get_profile_by_user(userId).then(profile => {
@@ -79,23 +123,62 @@
                     <p>Role: ${profile.role}</p>
                     <p>Phone Number: ${profile.phone_number}</p>
                 `;
-                    document.getElementById("profile-pic").innerHTML = `
-                     <img src="${profile.profile_pic}" alt="Profile Picture" style="width: 200px; height: 200px;">
-                `;
+                    if (profile.profile_pic) {
+                        document.getElementById("profile-pic").src = profile.profile_pic;
+                    }
+                    else {
+                        document.getElementById("profile-pic").src = "/home/umairio/Desktop/ecommerce/media/profile_pics/click_to_add.jpg";
+                    }
                 })
                     .catch(error => {
                         console.error('Error fetching profile:', error);
                     });
-                })
-                request_user().then(user => {
-                    if (user.id == userId) {
-                        document.getElementById("edit-profile").innerHTML = `
-                            <br><a href="edit_profile.html" class="btn btn-primary">Edit Profile</a>
+            })
+            request_user().then(user => {
+                if (user.id == userId) {
+                    document.getElementById("edit-profile").innerHTML = `
+                            <a href="edit_profile.html" class="btn btn-primary">Edit Profile</a>
                         `;
-                    }
-                });
+                }
+            });
         }
 
+        function triggerFileInput() {
+            document.getElementById("profile-pic-input").click();
+        }
+
+        function updateProfilePic() {
+            const fileInput = document.getElementById("profile-pic-input");
+            const profilePic = fileInput.files[0];
+            console.log("profilePic");
+            if (profilePic) {
+                request_user().then(user => {
+                    const formData = new FormData();
+                    formData.append("profile_pic", profilePic);
+
+                    fetch(`http://127.0.0.1:8000/api/profile/${user.id}/`, {
+                        method: "PATCH",
+                        body: formData,
+                        headers: {
+                            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+                        }
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error("Failed to update profile picture");
+                            }
+                        })
+                        .then(data => {
+                            populate_profile_div(user.id);
+                        })
+                        .catch(error => {
+                            console.error(error);
+                        });
+                });
+            }
+        }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
         integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
