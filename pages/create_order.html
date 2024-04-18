@@ -51,7 +51,6 @@
         .addEventListener("submit", function (event) {
           event.preventDefault();
           let address = document.getElementById("address").value;
-          var access = localStorage.getItem("accessToken");
           fetch("http://127.0.0.1:8000/api/order/", {
             method: "POST",
             body: JSON.stringify({
@@ -61,7 +60,7 @@
               shipping_address: address,
             }),
             headers: {
-              Authorization: "Bearer " + access,
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
               "Content-Type": "application/json",
             },
           })

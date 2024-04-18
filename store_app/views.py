@@ -74,10 +74,10 @@ class ProfileViewSet(ModelViewSet):
         self.perform_create(serializer)
         return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):  # role cannot be changed
+    def update(self, request, *args, **kwargs):
         data = request.data
-        data.pop("role")
-
+        if "role" in data:
+            data.pop("role")
         instance = self.get_object()
         if instance.user != request.user:
             return Response(

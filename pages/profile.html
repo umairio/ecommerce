@@ -73,13 +73,14 @@
             userEmail = get_user_info(userId).then(user => {
                 userEmail = user.email;
                 get_profile_by_user(userId).then(profile => {
+                    profile = profile[0];
                     document.getElementById("profile-info").innerHTML = `
                     <p>Email: ${userEmail}</p>
-                    <p>Role: ${profile[0].role}</p>
-                    <p>Phone Number: ${profile[0].phone_number}</p>
+                    <p>Role: ${profile.role}</p>
+                    <p>Phone Number: ${profile.phone_number}</p>
                 `;
                     document.getElementById("profile-pic").innerHTML = `
-                     <img src="${profile[0].profile_pic}" alt="Profile Picture" style="width: 200px; height: 200px;">
+                     <img src="${profile.profile_pic}" alt="Profile Picture" style="width: 200px; height: 200px;">
                 `;
                 })
                     .catch(error => {
@@ -87,10 +88,9 @@
                     });
                 })
                 request_user().then(user => {
-                    console.log(user.id,userId);
                     if (user.id == userId) {
                         document.getElementById("edit-profile").innerHTML = `
-                            <br><a href="edit_profile.html?user=${user.id}" class="btn btn-primary">Edit Profile</a>
+                            <br><a href="edit_profile.html" class="btn btn-primary">Edit Profile</a>
                         `;
                     }
                 });

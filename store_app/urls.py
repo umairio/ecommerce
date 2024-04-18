@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -24,4 +26,5 @@ urlpatterns = [
     path("api/login/refresh/", TokenRefreshView.as_view()),
     path("api/logout/", views.LogoutView.as_view(), name="logout"),
     path("api/change-password/", views.ChangePasswordView.as_view()),
-]
+
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
