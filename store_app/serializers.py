@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     profile_pic = serializers.ImageField(required=False)
+
     class Meta:
         model = Profile
         fields = ["id", "user", "profile_pic", "role", "phone_number"]
@@ -124,15 +125,11 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         old_password = attrs.get("old_password")
-        new_password = attrs.get("new_password")
         user = self.context["request"].user
-        # from pdb import set_trace; set_trace()
         if not user.check_password(old_password):
             raise serializers.ValidationError(
                 {"old_password": ["Wrong password."]}
             )
-
-        # validate_password(new_password)
         return attrs
 
     def validate_new_password(self, value):

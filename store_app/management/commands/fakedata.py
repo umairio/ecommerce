@@ -4,7 +4,6 @@ from django.core.management.base import BaseCommand
 from faker import Faker
 
 # from store_app.constants import ProfileRole
-from store_app.models import *
 
 fake = Faker("en_US")
 

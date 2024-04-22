@@ -5,3 +5,4 @@ profile = "black"
 multi_line_output = 3
 line_length = 80
 known_third_party = ["django"]
+skip = ["env/", ".env/"]
