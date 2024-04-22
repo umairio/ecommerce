@@ -114,3 +114,26 @@ const request_user = async () => {
     console.log(error);
   }
 };
+
+const loggedin_redirect = async () => {
+  request_user()
+    .then((user) => {
+      get_profile_by_user(user.id)
+        .then((profile) => {
+          if (profile.length === 0) {
+            window.location.href = "create_profile.html";
+          } else {
+            profile = profile[0]
+            if (profile.role === "ADMIN") {
+              window.location.href = "admin.html";
+            } else if (profile.role === "seller") {
+              window.location.href = "seller.html";
+            } else if (profile.role === "buyer") {
+              window.location.href = "products.html";
+            } else if (profile.role === "owner") {
+              window.location.href = "shop.html";
+            }
+          };
+        })
+    })
+}

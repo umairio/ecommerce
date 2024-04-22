@@ -59,22 +59,11 @@ class ProfileViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
-    def list(self, request, *args, **kwargs):
-        userId = request.query_params.get("user")
-        if userId:
-            self.queryset = self.queryset.filter(user=userId)
-        return super().list(request, *args, **kwargs)
-
-    def create(
-        self, request, *args, **kwargs
-    ):  # for creating own profile not else
-        data = request.data
-        user = request.user
-        data["user"] = user.id
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.query_params.get('user', None)
+        if user is not None:
+            return self.queryset.filter(user__id=user)
+        return self.queryset
 
     def update(self, request, *args, **kwargs):
         data = request.data

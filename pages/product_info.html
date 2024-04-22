@@ -131,7 +131,7 @@
             reviewDiv.classList.add("review");
             reviewDiv.innerHTML = `
               <div class="card" style="width: 35rem; margin-bottom: 10px; padding: 5px; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
-                  <p class="card-title">${user.email}</p>
+                  <a href="profile.html?user=${user.id}"><p class="card-title">${user.email}</p></a>
                   <p class="card-subtitle mb-2 text-muted">Rating: ${review.rating}</p>
                   <p class="card-text">${review.comment}</p>
               </div>

@@ -86,7 +86,8 @@
             <div class="col-md-6" id="profile-info" style="margin-top: 2rem;">
             </div>
             <div class="col-md-6" id="profile-pic-container">
-                <div id="profile-pic-overlay" onclick="triggerFileInput()">
+                <div id="profile-pic-overlay" 
+                onclick="document.getElementById('profile-pic-input').click()">
                     <label id="edit-profile-pic-label">✏️</label>
                 </div>
                 <img id="profile-pic" src="" alt="Profile Picture">
@@ -113,21 +114,24 @@
         };
 
         function populate_profile_div(userId) {
-            var userEmail;
-            userEmail = get_user_info(userId).then(user => {
-                userEmail = user.email;
+            get_user_info(userId).then(user => {
                 get_profile_by_user(userId).then(profile => {
-                    profile = profile[0];
-                    document.getElementById("profile-info").innerHTML = `
-                    <p>Email: ${userEmail}</p>
-                    <p>Role: ${profile.role}</p>
-                    <p>Phone Number: ${profile.phone_number}</p>
-                `;
-                    if (profile.profile_pic) {
-                        document.getElementById("profile-pic").src = profile.profile_pic;
-                    }
-                    else {
-                        document.getElementById("profile-pic").src = "/home/umairio/Desktop/ecommerce/media/profile_pics/click_to_add.jpg";
+                    if (profile.length < 0) {
+                        window.location.href = "create_profile.html";
+                    } else {
+
+                        profile = profile[0];
+                        document.getElementById("profile-info").innerHTML = `
+                            <p>Email: ${user.email}</p>
+                            <p>Role: ${profile.role}</p>
+                            <p>Phone Number: ${profile.phone_number}</p>
+                        `;
+                        if (profile.profile_pic) {
+                            document.getElementById("profile-pic").src = profile.profile_pic;
+                        }
+                        else {
+                            document.getElementById("profile-pic").src = "/home/umairio/Desktop/ecommerce/media/profile_pics/click_to_add.jpg";
+                        }
                     }
                 })
                     .catch(error => {
@@ -137,45 +141,41 @@
             request_user().then(user => {
                 if (user.id == userId) {
                     document.getElementById("edit-profile").innerHTML = `
-                            <a href="edit_profile.html" class="btn btn-primary">Edit Profile</a>
-                        `;
+                        <a href="edit_profile.html" class="btn btn-primary">Edit Profile</a>
+                    `;
                 }
             });
         }
-
-        function triggerFileInput() {
-            document.getElementById("profile-pic-input").click();
-        }
-
         function updateProfilePic() {
             const fileInput = document.getElementById("profile-pic-input");
             const profilePic = fileInput.files[0];
-            console.log("profilePic");
             if (profilePic) {
                 request_user().then(user => {
                     const formData = new FormData();
                     formData.append("profile_pic", profilePic);
-
-                    fetch(`http://127.0.0.1:8000/api/profile/${user.id}/`, {
-                        method: "PATCH",
-                        body: formData,
-                        headers: {
-                            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-                        }
-                    })
-                        .then(response => {
-                            if (response.ok) {
-                                return response.json();
-                            } else {
-                                throw new Error("Failed to update profile picture");
+                    get_profile_by_user(user.id).then(profile => {
+                        profile = profile[0];
+                        fetch(`http://127.0.0.1:8000/api/profile/${profile.id}/`, {
+                            method: "PATCH",
+                            body: formData,
+                            headers: {
+                                Authorization: "Bearer " + localStorage.getItem("accessToken"),
                             }
                         })
-                        .then(data => {
-                            populate_profile_div(user.id);
-                        })
-                        .catch(error => {
-                            console.error(error);
-                        });
+                            .then(response => {
+                                if (response.ok) {
+                                    return response.json();
+                                } else {
+                                    throw new Error("Failed to update profile picture");
+                                }
+                            })
+                            .then(data => {
+                                populate_profile_div(user.id);
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    })
                 });
             }
         }
