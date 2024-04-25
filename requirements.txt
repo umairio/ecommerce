@@ -15,3 +15,4 @@ isort
 pre-commit
 reportlab
 django_extensions
+django-cors-headers
