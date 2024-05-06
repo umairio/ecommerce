@@ -34,6 +34,12 @@ docker-compose up
 
 This command will build the Django application, start the PostgreSQL database, and run the Django server.
 
+### Migrate the Database
+
+```bash
+docker-compose run web python manage.py migrate
+```
+
 ### Create a Superuser
 To create a Django superuser for accessing the admin interface, run the following command after starting the application:
 
