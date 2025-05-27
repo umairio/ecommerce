@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Products</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet" />
+  <script src="func.js"></script>
+</head>
+<style>
+  body {
+    font-family: "Montserrat";
+  }
+</style>
+
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid d-flex justify-content-start gap-3">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="products.html">Home</a>
+      <div class="collapse navbar-collapse" id="navbarText">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="products.html">Products</a>
+            <a class="nav-link" href="profile.html">Profile</a>
+            <a class="nav-link" href="orders.html">Orders</a>
+            <a class="nav-link" href="logout.html">Logout</a>
+            <hr class="dropdown-divider border border-light" />
+            <a class="nav-link" href="http://127.0.0.1:8000/admin">Django Admin</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h2 style="margin: 10px">Product Information</h2>
+        <div id="product-info"></div>
+        <div class="quantity-control mb-3">
+          <button id="decrement" class="btn btn-secondary">-</button>
+          <input type="number" id="quantity" name="quantity" min="1" value="1" style="width: 50px" />
+          <button id="increment" class="btn btn-secondary">+</button>
+        </div>
+        <p>Total Amount: <span id="total-amount"></span></p>
+        <button id="buy-now-btn" class="btn btn-primary">Buy Now</button>
+      </div>
+      <div class="col-md-6">
+        <h2 style="margin: 10px">Reviews</h2>
+
+        <div id="reviews"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get("id");
+      const quantityInput = document.getElementById("quantity");
+
+      const product = await get_product_info(productId);
+      const productInfoContainer = document.getElementById("product-info");
+      productInfoContainer.innerHTML = `
+          <p><strong>ID:</strong> ${product.id}</p>
+          <p><strong>Name:</strong> ${product.name}</p>
+          <p><strong>Description:</strong> ${product.description}</p>
+          <p><strong>Category:</strong> ${product.category}</p>
+          <p><strong>Sales Count:</strong> ${product.sales_count}</p>
+          <p><strong>Rating:</strong> ${product.rating}</p>
+          <p><strong>Price:</strong> ${product.price} Rs</p>
+          <p><strong>Shop:</strong> ${product.shop}</p>
+          <p><strong>Seller:</strong> ${product.seller}</p>
+        `;
+
+      function updateTotal(price, quantity) {
+        const totalAmount = price * quantity;
+        document.getElementById("total-amount").textContent =
+          totalAmount.toFixed(2) + "Rs";
+      }
+
+      document
+        .getElementById("increment")
+        .addEventListener("click", function () {
+          quantityInput.value++;
+          updateTotal(product.price, quantityInput.value);
+        });
+
+      document
+        .getElementById("decrement")
+        .addEventListener("click", function () {
+          if (quantityInput.value > 1) {
+            quantityInput.value--;
+            updateTotal(product.price, quantityInput.value);
+          }
+        });
+
+      document
+        .getElementById("buy-now-btn")
+        .addEventListener("click", function () {
+          const quantity = document.getElementById("quantity").value;
+          window.location.href = `create_order.html?id=${productId}&quantity=${quantity}`;
+        });
+
+      updateTotal(product.price, quantityInput.value);
+
+      fetch(`http://127.0.0.1:8000/api/review/?product=${productId}`, {
+        method: "GET",
+        headers: {
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => response.json())
+        .then((reviews) => {
+          const reviewsContainer = document.getElementById("reviews");
+          reviews.forEach(async (review) => {
+            user = await get_user_info(review.reviewer);
+            console.log(user);
+            const reviewDiv = document.createElement("div");
+            reviewDiv.classList.add("review");
+            reviewDiv.innerHTML = `
+              <div class="card" style="width: 35rem; margin-bottom: 10px; padding: 5px; box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+                  <a href="profile.html?user=${user.id}"><p class="card-title">${user.email}</p></a>
+                  <p class="card-subtitle mb-2 text-muted">Rating: ${review.rating}</p>
+                  <p class="card-text">${review.comment}</p>
+              </div>
+
+            `;
+            reviewsContainer.appendChild(reviewDiv);
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching reviews:", error);
+        });
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+    integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+    integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -5,7 +5,7 @@ repos:
       - id: flake8
         exclude: |
           (?x)^(.*/settings\.py|.*migrations.*)$
-        args: [--max-line-length=120]
+        args: [--max-line-length=80]
          
 repos:
   - repo: https://github.com/pycqa/isort
