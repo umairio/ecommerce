@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="formstyle.css" />
+  <script src="func.js"></script>
+</head>
+
+<body>
+  <div class="form_wrapper">
+    <div class="form_container">
+      <div class="title_container">
+        <h2>Login From</h2>
+      </div>
+
+      <div class="row clearfix">
+        <div>
+          <form id="loginForm">
+            <div class="input_field">
+              <span><i class="fa fa-envelope" aria-hidden="true"></i> </span>
+              <input type="email" name="email" placeholder="Email" required />
+            </div>
+
+            <div class="input_field">
+              <span><i class="fa fa-lock" aria-hidden="true"></i> </span>
+              <input type="password" name="password" placeholder="Password" required />
+            </div>
+
+            <input class="button" type="submit" value="Login" />
+
+            <div class="extraLinks">
+              <a class="customLink" href="register.html">Create a new account</a>
+              <a class="customLink" href="change_password.html">Change Password</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="loginMessage" style="display: none">
+      <p>Login successful! Redirecting...</p>
+    </div>
+  </div>
+
+  <script>
+    document
+      .getElementById("loginForm")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+        fetch("http://127.0.0.1:8000/api/login/", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            } else {
+              throw new Error("Login failed");
+            }
+          })
+          .then((data) => {
+            var accessToken = data.access;
+            var refreshToken = data.refresh;
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("refreshToken", refreshToken);
+            document.getElementById("loginMessage").style.display = "block";
+            setTimeout(loggedin_redirect(), 1000);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Login failed. wrong credentials.");
+          });
+      });
+    
+  </script>
+</body>
+
+</html>

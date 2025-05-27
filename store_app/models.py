@@ -41,7 +41,7 @@ class Profile(models.Model):
     phone_number = models.CharField(_("phone number"), max_length=15)
 
     def __str__(self):
-        return self.user.email +  f"({self.role})"
+        return self.user.email + f"({self.role})"
 
 
 class Category(models.Model):
@@ -72,7 +72,7 @@ class Order(models.Model):
         _("status"),
         max_length=10,
         choices=OrderStatus.STATUS,
-        default=OrderStatus.CART,
+        default=OrderStatus.CONFIRMED,
     )
 
     def __str__(self):

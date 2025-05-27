@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logout</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+    integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="formstyle.css" />
+  <script src="func.js"></script>
+</head>
+
+<body>
+    <div class="form_wrapper">
+        <div class="form_container">
+          <div class="title_container">
+        <h2>Logout</h2>
+        <p>Are you sure you want to logout?</p>
+        <form id="logout">
+            <input class="button" type="submit" value="Logout" />
+            <input class="button" type="submit" onclick="window.history.back()" value="Go Back"/>
+        </form>
+    </div>
+</div>
+</div>
+</body>
+<script>
+    document.getElementById("logout").addEventListener("submit", function (event) {
+        event.preventDefault();
+        fetch("http://127.0.0.1:8000/api/logout/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        })
+
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "login.html";
+    })
+</script>
+</html>

@@ -1,4 +1,3 @@
-from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -6,10 +5,18 @@ from .constants import OrderStatus, ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop, User
 
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+
+
 class ProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.ImageField(required=False)
+
     class Meta:
         model = Profile
-        fields = "__all__"
+        fields = ["id", "user", "profile_pic", "role", "phone_number"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -47,16 +54,10 @@ class OrderSerializer(serializers.ModelSerializer):
         model = Order
         fields = "__all__"
 
-    def validate(self, attrs):
-        buyer = attrs.get("buyer")
-        seller = attrs.get("seller")
-        if buyer.profile.role != ProfileRole.Buyer:
-            raise serializers.ValidationError(f"{buyer} is not a buyer")
-        if seller.profile.role != ProfileRole.Seller:
-            raise serializers.ValidationError(f"{seller} is not a seller")
-        if attrs["quantity"] <= 0:
+    def validate_quantity(self, value):
+        if value <= 0:
             raise serializers.ValidationError("Quantity must be greater than 0")
-        return attrs
+        return value
 
 
 class ShopSerializer(serializers.ModelSerializer):
@@ -91,7 +92,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     )
 
     password = serializers.CharField(
-        write_only=True, required=True, validators=[validate_password]
+        write_only=True,
+        required=True,
     )
     password2 = serializers.CharField(write_only=True, required=True)
 
@@ -123,15 +125,11 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         old_password = attrs.get("old_password")
-        new_password = attrs.get("new_password")
         user = self.context["request"].user
-        # from pdb import set_trace; set_trace()
         if not user.check_password(old_password):
             raise serializers.ValidationError(
                 {"old_password": ["Wrong password."]}
             )
-
-        validate_password(new_password)
         return attrs
 
     def validate_new_password(self, value):

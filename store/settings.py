@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "drf_registration",
     "django_celery_beat",
     "django_celery_results",
+    'corsheaders',
     'store_app.apps.StoreAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,6 +51,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,13 +135,18 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'
+
+
 # User model
 AUTH_USER_MODEL = "store_app.User"
 
 # DRF settings
 REST_FRAMEWORK = {
-    # 'DEFAULT_AUTHENTICATION_CLASSES': []
-   'DEFAULT_AUTHENTICATION_CLASSES': [
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -158,3 +166,5 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_BACKEND = 'django-db'
 CELERY_CACHE_BACKEND = 'default'
+
+CORS_ALLOW_ALL_ORIGINS = True

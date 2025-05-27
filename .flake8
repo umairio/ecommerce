@@ -6,3 +6,4 @@ exclude =
     */asgi.py
     */wsgi.py
     */manage.py
+    env
