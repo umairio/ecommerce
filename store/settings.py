@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,7 +33,14 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'store_app',
+    "django_extensions",
+    "rest_framework_simplejwt.token_blacklist",
+    "rest_framework_simplejwt",
+    "rest_framework",
+    "drf_registration",
+    "django_celery_beat",
+    "django_celery_results",
+    'store_app.apps.StoreAppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -55,7 +64,7 @@ ROOT_URLCONF = 'store.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS':  [os.path.join(BASE_DIR, "templates")],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,3 +131,30 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# User model
+AUTH_USER_MODEL = "store_app.User"
+
+# DRF settings
+REST_FRAMEWORK = {
+    # 'DEFAULT_AUTHENTICATION_CLASSES': []
+   'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ]
+}
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME' : timedelta(hours=5),
+    'REFRESH_TOKEN_LIFETIME' : timedelta(days=1),
+    'AUTH_TOKEN_CLASSES': ("rest_framework_simplejwt.tokens.AccessToken",)
+}
+
+#Celer
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_CACHE_BACKEND = 'default'

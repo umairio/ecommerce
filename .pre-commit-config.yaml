@@ -1,0 +1,14 @@
+repos:
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        exclude: |
+          (?x)^(.*/settings\.py|.*migrations.*)$
+        args: [--max-line-length=120]
+         
+repos:
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort

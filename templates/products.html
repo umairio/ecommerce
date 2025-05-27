@@ -1,0 +1,54 @@
+{% extends 'navbar.html' %}
+
+{% block title %}Products - My Website{% endblock %}
+
+{% block content %}
+<div class="container">
+   <h2>Products</h2>
+   <div id="product-list">
+       <!-- Product items will be dynamically added here -->
+   </div>
+   <table class="table">
+       <thead>
+           <tr>
+               <th>Name</th>
+               <th>Description</th>
+               <th>Price</th>
+               <th>Shop</th>
+               <th>Seller</th>
+           </tr>
+       </thead>
+       <tbody id="product-table-body">
+           <!-- Table body will be dynamically populated here -->
+       </tbody>
+   </table>
+</div>
+
+<script>
+   // Fetch product data from the DRF API endpoint
+   fetch('/api/product/')
+       .then(response => response.json())
+       .then(products => {
+           const tableBody = document.getElementById('product-table-body');
+
+           // Iterate through each product and create table rows
+           products.forEach(product => {
+               const row = document.createElement('tr');
+               row.innerHTML = `
+                   <td>${product.name}</td>
+                   <td>${product.description}</td>
+                   <td>${product.price}</td>
+                   <td>${product.shop}</td>
+                   <td>${product.seller.email}</td>
+               `;
+               tableBody.appendChild(row);
+           });
+       })
+       .catch(error => {
+           console.error('Error fetching products:', error);
+       });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</div>
+{% endblock %}
