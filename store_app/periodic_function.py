@@ -9,6 +9,7 @@ from reportlab.pdfgen import canvas
 from .constants import OrderStatus, ProfileRole
 from .models import Inventory, Order, Product, Profile, Review, Shop
 
+
 fake = Faker()
 
 
@@ -53,7 +54,7 @@ def owner_report(owner):
         # Draw rows on the page
         x = 10
         y = page_height - 20
-        for row in order_data[current_row:current_row + max_rows_per_page]:
+        for row in order_data[current_row : current_row + max_rows_per_page]:
             for i in range(len(row)):
                 p.drawString(x, y, str(row[i]))
                 x += column_widths[i]
@@ -119,7 +120,7 @@ def seller_report(seller):
         # Draw rows on the page
         x = 10
         y = page_height - 20
-        for row in order_data[current_row:current_row + max_rows_per_page]:
+        for row in order_data[current_row : current_row + max_rows_per_page]:
             for i in range(len(row)):
                 p.drawString(x, y, str(row[i]))
                 x += column_widths[i]
